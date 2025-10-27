@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk" data-bs-theme="light">
+<html lang="uk" data-bs-theme="{{ request.cookies.get('theme', 'light') }}">
 
 <head>
     <meta charset="UTF-8" />

@@ -1,2 +1,167 @@
 {% extends "base.html" %}
-{% block content %}{% endblock %}
+{% set current_theme =
+request.cookies.get('theme', 'light') %}
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4"> <!-- 'g-4' додає відступи -->
+
+        <!-- ============================================= -->
+        <!-- КОЛОНКА 1: Профіль, Тема, Вихід             -->
+        <!-- ============================================= -->
+        <div class="col-lg-4">
+
+            <!-- Картка "Вітаю" -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-person-circle display-2 text-primary"></i>
+
+                    <!-- 1. Привітальний текст -->
+                    <h2 class="display-6 mt-2">
+                        Вітаю, {{ username | capitalize }}!
+                    </h2>
+
+                    <!-- 2. Текст сторінки -->
+                    <p class="lead">Це ваша особиста сторінка.</p>
+
+                    <!-- 4. Кнопка закінчення сесії (веде на /logout) -->
+                    <a href="{{ url_for('users.logout') }}" class="btn btn-danger w-100 mt-3">
+                        <i class="bi bi-box-arrow-right me-2"></i>
+                        Закінчити сесію
+                    </a>
+                </div>
+            </div>
+
+            <div class="btn-group " role="group" aria-label="Theme switcher">
+                <a href="{{ url_for('users.set_theme', theme_name='light') }}"
+                    class="btn btn-outline-primary {% if current_theme == 'light' %}active{% endif %}">
+                    <i class="bi bi-sun-fill"></i> Світла
+                </a>
+                <a href="{{ url_for('users.set_theme', theme_name='dark') }}"
+                    class="btn btn-outline-primary {% if current_theme == 'dark' %}active{% endif %}">
+                    <i class="bi bi-moon-stars-fill"></i> Темна
+                </a>
+            </div>
+        </div>
+
+        <!-- ============================================= -->
+        <!-- КОЛОНКА 2: Управління Cookies              -->
+        <!-- ============================================= -->
+        <div class="col-lg-8">
+
+            <h3 class="display-6 border-bottom pb-2 mb-3">
+                <i class="bi bi-shield-lock-fill me-2"></i>Управління Cookies
+            </h3>
+
+            <!-- 8. Список всіх кукі (з Jinja2) -->
+            <div class="card shadow-sm border-0 mb-4">
+                <h5 class="card-title">Активні Cookies</h5>
+                <!-- <h2>Список всіх кукі</h2> -->
+                {% if request.cookies %}
+                <ul class="list-group">
+                    {% for key, value in request.cookies.items() %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-break">
+                        <div>
+                            <strong class="me-2">{{ key }}:</strong>
+                            <span>{{ value[:50] }}{{ '...' if value|length > 50 else '' }}</span>
+                        </div>
+                        {% if key == 'session' %}
+                        <span class="badge bg-secondary rounded-pill">Сесія</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">Кукі не знайдено.</p>
+                {% endif %}
+            </div>
+
+            <!-- 5, 6, 7. Форми управління Cookies (у табах) -->
+            <!-- (Таби Bootstrap працюють без JS для відображення) -->
+
+            <ul class="nav nav-tabs" id="cookieTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="add-tab" data-bs-toggle="tab" data-bs-target="#add-pane"
+                        type="button" role="tab">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Додати
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete-pane"
+                        type="button" role="tab">
+                        <i class="bi bi-trash-fill me-2"></i>Видалити
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="delete-all-tab" data-bs-toggle="tab" data-bs-target="#delete-all-pane"
+                        type="button" role="tab">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Видалити всі
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Контент табів -->
+            <div class="tab-content card shadow-sm border-0 border-top-0 p-4" id="cookieTabsContent">
+
+                <!-- 5. Форма "Додати кукі" -->
+                <div class="tab-pane fade show active" id="add-pane" role="tabpanel">
+                    <h5>Додати нове Cookie</h5>
+                    <form action="{{ url_for('users.profile') }}" method="POST">
+                        <input type="hidden" name="action" value="add_cookie">
+                        <div class="mb-3">
+                            <label for="cookie_key" class="form-label">Ключ (Key)</label>
+                            <input type="text" class="form-control" name="cookie_key" id="cookie_key" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cookie_value" class="form-label">Значення (Value)</label>
+                            <input type="text" class="form-control" name="cookie_value" id="cookie_value" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="cookie_expiry" class="form-label">Термін дії (у днях)</label>
+                            <input type="number" class="form-control" name="cookie_expiry" id="cookie_expiry"
+                                placeholder="Напр., 30" min="1">
+                            <small class="form-text text-muted">Залиште порожнім для сесійного cookie.</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Зберегти Cookie
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 6. Форма "Видалити кукі за ключем" -->
+                <div class="tab-pane fade" id="delete-pane" role="tabpanel">
+                    <h5>Видалити Cookie за ключем</h5>
+                    <form action="{{ url_for('users.profile') }}" method="POST">
+                        <input type="hidden" name="action" value="delete_cookie">
+                        <div class="mb-3">
+                            <label for="cookie_key_delete" class="form-label">Ключ (Key)</Ulabel>
+                                <input type="text" class="form-control" name="cookie_key_delete" id="cookie_key_delete"
+                                    placeholder="Напр., user_preference" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>Видалити
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 7. Форма "Видалити всі кукі" -->
+                <div class="tab-pane fade" id="delete-all-pane" role="tabpanel">
+                    <h5>Видалити всі кастомні Cookies</h5>
+                    <form action="{{ url_for('users.profile') }}" method="POST">
+                        <input type="hidden" name="action" value="delete_all">
+                        <p class="text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Обережно!</strong> Це видалить всі cookies,
+                            (окрім сесії, яка вас тримає залогіненим).
+                        </p>
+                        <button type="submit" class="btn btn-warning">
+                            Видалити всі
+                        </button>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
