@@ -17,12 +17,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <!-- Підключення кастомних стилів -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mystyle.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flashes.css') }}" />
 </head>
 
 <body>
     {% include 'includes/navbar.html' %}
 
-    <main class="container my-6">{% block content %}{% endblock %}</main>
+    <main class="container my-6"> {% with messages = get_flashed_messages(with_categories=True) %}{% if
+        messages %} {% for category, message in messages %}
+        <ul class="flashes {{ category }}">
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}{% block content %}{% endblock %}
+    </main>
 
     {% include 'includes/footer.html' %}
 

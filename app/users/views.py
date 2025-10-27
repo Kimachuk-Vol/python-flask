@@ -1,4 +1,4 @@
-from flask import Blueprint, url_for, redirect, request, render_template
+from flask import Blueprint,flash, url_for, redirect, request, render_template, session, make_response
 
 users_bp = Blueprint(
     'users', __name__,
@@ -18,5 +18,24 @@ def admin():
     print(to_url)
     return redirect(to_url)
 
+@users_bp.route("/login", methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] != 'kimachuk' or \
+                request.form['password'] != 'volodymyr':
+            flash('Invalid credentials','error')
+        else:
+            session['username'] = request.form['username']
+            flash('You were successfully logged in','success')
+            return redirect(url_for('users.profile'))
+    return render_template("users/login.html",title="Login")
 
-
+@users_bp.route("/profile", methods=["GET", "POST"])
+def profile():
+    username = session.get("username")
+    if not username:
+        flash("Please log in to view this page.", "warning")
+        return redirect(url_for("users.login"))
+    return render_template(
+        "users/profile.html", title="Profile", username=username
+    )
