@@ -1,0 +1,123 @@
+/* --- 1. Глобальні стилі --- */
+
+/* Застосовуємо шрифт, який ви підключили в base.html (Roboto) */
+body {
+  font-family: "Roboto", sans-serif;
+
+  /* Плавний скрол для будь-яких якірних посилань */
+  scroll-behavior: smooth;
+
+  /* Виправлення для "прилипаючого" футера: 
+     тіло займає всю висоту, а 'main' розширюється */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  /* Цей блок буде "виштовхувати" футер вниз */
+  flex: 1 0 auto;
+}
+
+/* Додамо трохи більше виразності заголовкам */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.display-6 {
+  font-weight: 500; /* Трохи жирніший, ніж стандартний */
+}
+
+/* --- 2. Навігаційна панель (navbar.html) --- */
+
+.navbar {
+  /* Додамо легку тінь, щоб "відірвати" її від контенту */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.navbar-brand {
+  font-weight: 700; /* Зробимо бренд жирнішим */
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* Ефект при наведенні на посилання в навігації */
+.nav-link:hover {
+  /* Використовуємо стандартний синій колір Bootstrap для акценту */
+  color: #0d6efd !important;
+  transform: translateY(-2px); /* Легкий "підйом" */
+}
+
+/* --- 3. Футер (footer.html) --- */
+
+/* Плавна анімація для іконок соцмереж у футері */
+footer.bg-black .bi {
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+footer.bg-black .bi:hover {
+  color: #0d6efd !important; /* Акцентний колір при наведенні */
+  transform: scale(1.1); /* Трохи збільшити іконку */
+}
+
+/* --- 4. Сторінка Резюме (resume.html) --- */
+
+/* Картка з фото профілю */
+.card {
+  /* Плавний перехід для тіні */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border: none; /* Прибираємо стандартну рамку, покладемося на тінь */
+}
+
+.card:hover {
+  /* Ефект "підйому" картки при наведенні */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* "Пігулки" навичок */
+.badge.bg-primary,
+.badge.bg-secondary {
+  border-radius: 50rem; /* Робить їх овальними "пігулками" */
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5em 1em;
+  transition: all 0.2s ease;
+}
+
+.badge.bg-primary:hover,
+.badge.bg-secondary:hover {
+  background-color: #0a58ca !important; /* Трохи темніший синій */
+  transform: scale(1.05);
+}
+
+/* Лінія-роздільник під заголовками секцій */
+.display-6.border-bottom {
+  border-color: #0d6efd !important; /* Акцентна лінія */
+  border-width: 2px !important;
+}
+
+/* --- 5. Сторінка Контактів (contacts.html) --- */
+
+/* Акцент на полях форми при фокусі (кліку) */
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Ефект для головної кнопки відправки */
+.btn-primary {
+  transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+
+        <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+            <div class="card shadow-sm">
+                <img src="{{ url_for('static', filename='images/portrait.jpeg') }}" class="img-fluid"
+                    alt="Ваше фото профілю">
+
+                <div class="card-body">
+                    <h4 class="card-title text-center">Кімачук Володимир</h4>
+                    <p class="card-text text-center text-muted">Студент</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-12">
+
+            <section id="bio" class="mb-5">
+                <h2 class="display-6 border-bottom pb-2 mb-3">
+                    <i class="bi bi-person-fill me-2"></i>Про Мене
+                </h2>
+                <p class="lead">
+                    Мотивований студент з практичним досвідом у розробці програм.
+                    Шукаю можливість застосувати свої знання в роботі
+                    для вирішення складних завдань та професійного зростання.
+                </p>
+                <!-- <p>
+                </p> -->
+            </section>
+
+            <section id="skills" class="mb-5">
+                <h2 class="display-6 border-bottom pb-2 mb-3">
+                    <i class="bi bi-tools me-2"></i>Ключові Навички
+                </h2>
+
+                <h4 class="h5">Технічні навички (Hard Skills)</h4>
+                <div class="mb-3">
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">Python</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">Docker</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">Git</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">SQL (MSQLS)</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">CI/CD (Github Action)</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">Linux</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">JavaScript</span>
+                    <span class="badge bg-primary fs-6 me-1 mb-2 p-2">Angular</span>
+                </div>
+
+                <h4 class="h5">Особисті якості (Soft Skills)</h4>
+                <div>
+                    <span class="badge bg-secondary fs-6 me-1 mb-2 p-2">Комунікація</span>
+                    <span class="badge bg-secondary fs-6 me-1 mb-2 p-2">Робота в команді</span>
+                    <span class="badge bg-secondary fs-6 me-1 mb-2 p-2">Вирішення проблем</span>
+                    <span class="badge bg-secondary fs-6 me-1 mb-2 p-2">Адаптивність</span>
+                    <span class="badge bg-secondary fs-6 me-1 mb-2 p-2">Управління часом</span>
+                </div>
+            </section>
+
+            <section id="education" class="mb-5">
+                <h2 class="display-6 border-bottom pb-2 mb-3">
+                    <i class="bi bi-mortarboard-fill me-2"></i>Освіта
+                </h2>
+
+                <ul class="list-unstyled">
+                    <li class="mb-4">
+                        <h5 class="mb-1">КНУВС</h5>
+                        <p class="text-muted mb-1">
+                            Спеціальність - Інженерія програмного забезпечення
+                        </p>
+                        <p class="small text-muted">Вересень 2023 – Дотепер</p>
+                    </li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
