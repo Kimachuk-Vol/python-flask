@@ -2,7 +2,6 @@
 
 Web Programming with Python
 
-![1](screenshots/4.png)
-![1](screenshots/1.png)
-![1](screenshots/2.png)
-![1](screenshots/3.png)
+![1](screenshots/resume.png)
+![1](screenshots/contacts.png)
+![1](screenshots/mobile.png)
