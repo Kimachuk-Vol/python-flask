@@ -1,4 +1,5 @@
-<nav class="navbar navbar-expand-lg bg-light shadow-sm">
+<nav class="navbar navbar-expand-lg shadow-sm">
+    <!-- bg-light -->
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url_for('resume') }}"> <i class="bi bi-box-seam-fill"></i> Кімачук
             Володимир
@@ -25,6 +26,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('users.admin') }}">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('product.get_products') }}">Products</a>
                 </li>
             </ul>
         </div>

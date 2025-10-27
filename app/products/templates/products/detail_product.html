@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9 col-md-10">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+
+                    <h1 class="display-6 border-bottom pb-2 mb-3">
+                        <i class="bi bi-box-seam me-2"></i> {{ product["name"] }}
+                    </h1>
+
+                    <h6 class="card-subtitle mb-4 text-muted">
+                        Product ID: {{ product["id"] }}
+                    </h6>
+
+                    <h4 class="h5 mt-4">Опис</h4>
+                    <p class="lead">
+                        {{ product.get('content', 'Для цього продукту наразі немає опису.') }}
+                    </p>
+
+                    <hr class="my-4">
+
+                    <a href="{{ url_for('product.get_products') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left-circle me-2"></i>
+                        Повернутися до списку
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

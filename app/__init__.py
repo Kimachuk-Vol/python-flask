@@ -8,5 +8,5 @@ from . import views
 from .users import views
 app.register_blueprint(views.users_bp)
 
-# from .posts import post_bp
-# app.register_blueprint(post_bp)
+from .products import products_bp
+app.register_blueprint(products_bp, url_prefix="/shop")

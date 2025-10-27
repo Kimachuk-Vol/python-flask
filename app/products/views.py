@@ -1,0 +1,17 @@
+from . import products_bp
+from flask import render_template, abort
+from ..utils.repo import product_repo
+
+@products_bp.route('/products') 
+def get_products():
+    products = product_repo.get_all()
+    return render_template("products.html", 
+                           products=products, title='Всі Товари')
+
+@products_bp.route('/product/<int:id>') 
+def detail_product(id):
+    if id > 3:
+        abort(404)
+    product = product_repo.get_by_id(id)
+    return render_template("detail_product.html", 
+                           product=product, title='Сторінка Товару')
