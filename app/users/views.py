@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response
-from .forms import LoginForm
+from ..forms import LoginForm
 from app import app
 
 users_bp = Blueprint(
@@ -27,17 +27,17 @@ def login():
         username = form.username.data
         password = form.password.data
         remember = form.remember.data
-        if username == 'admin' and password == 'secret':
+        if username == 'kimachuk' and password == 'volodymyr':
             session['username'] = username
             app.logger.info(f"Successful login for user: {username}")
             remember_msg = "із запам'ятовуванням" if remember else "без запам'ятовування"
             flash(f"Вхід успішно виконано, {username}! ({remember_msg})", 'success')
-            return redirect(url_for('users_bp.profile'))
+            return redirect(url_for('users.profile'))
         else:
             app.logger.warning(f"Failed login attempt for user: {username}")
 
             flash('Неправильне ім\'я користувача або пароль.', 'error')
-            return redirect(url_for('users_bp.login'))
+            return redirect(url_for('users.login'))
     elif request.method == 'POST':
         app.logger.debug(f"Login form validation failed. Errors: {form.errors}")
     return render_template("users/login.html", title="Login Page", form=form)

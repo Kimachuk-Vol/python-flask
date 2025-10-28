@@ -43,9 +43,11 @@ class ContactForm(FlaskForm):
     subject = SelectField(
         "Тема", 
         choices=[
-            ('general', 'Загальне питання'),
-            ('support', 'Технічна підтримка'),
-            ('billing', 'Питання по оплаті')
+            ('job_offer', 'Пропозиція роботи'),
+            ('cooperation', 'Запит на співпрацю'),
+            ('feedback', 'Відгук про проєкт'),
+            ('question', 'Загальне питання'),
+            ('other', 'Інше')
         ],
         validators=[DataRequired(message="Будь ласка, оберіть тему.")]
     )

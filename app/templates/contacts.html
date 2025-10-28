@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block content %}{% from "_macros.html" import
+render_field %}
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-md-10">
@@ -13,47 +14,30 @@
                 Будь ласка, заповніть форму нижче, і я відповім вам найближчим часом.
             </p>
 
-            <form action="/submit-contact" method="POST">
+            <form method="POST" novalidate>
+                {{ form.hidden_tag() }}
                 <div class="mb-3">
-                    <label for="contactName" class="form-label">Ваше ім'я</label>
-                    <input type="text" class="form-control" id="contactName" name="contact_name"
-                        placeholder="Іван Петренко" required>
+                    {{ render_field(form.name, placeholder="Іван Петренко") }}
                 </div>
 
                 <div class="mb-3">
-                    <label for="contactEmail" class="form-label">Електронна пошта</label>
-                    <input type="email" class="form-control" id="contactEmail" name="contact_email"
-                        placeholder="example@gmail.com" required>
+                    {{ render_field(form.email, placeholder="example@gmail.com") }}
                 </div>
 
                 <div class="mb-3">
-                    <label for="contactPhone" class="form-label">Номер телефону (необов'язково)</label>
-                    <input type="tel" class="form-control" id="contactPhone" name="contact_phone"
-                        placeholder="+380 XX XXX XX XX">
+                    {{ render_field(form.phone, placeholder="+380XXXXXXXXX") }}
                 </div>
 
                 <div class="mb-3">
-                    <label for="contactReason" class="form-label">Причина звернення</label>
-                    <select class="form-select" id="contactReason" name="contact_reason" required>
-                        <option value="" selected disabled>Будь ласка, оберіть...</option>
-                        <option value="job_offer">Пропозиція роботи</option>
-                        <option value="cooperation">Запит на співпрацю</option>
-                        <option value="feedback">Відгук про проєкт</option>
-                        <option value="question">Загальне питання</option>
-                        <option value="other">Інше</option>
-                    </select>
+                    {{ render_field(form.subject) }}
                 </div>
 
                 <div class="mb-3">
-                    <label for="contactMessage" class="form-label">Ваше повідомлення</label>
-                    <textarea class="form-control" id="contactMessage" name="contact_message" rows="5"
-                        placeholder="Введіть ваше повідомлення тут..." required></textarea>
+                    {{ render_field(form.message, placeholder="Введіть ваше повідомлення тут...") }}
                 </div>
 
-                <div class="d-grid"> <button type="submit" class="btn btn-primary btn-lg">
-                        Відправити
-                        <i class="bi bi-send-fill ms-2"></i>
-                    </button>
+                <div class="d-grid">
+                    {{ form.submit(class="btn btn-primary btn-lg") }}
                 </div>
 
             </form>
