@@ -1,4 +1,6 @@
-from flask import Blueprint,flash, url_for, redirect, request, render_template, session, make_response
+from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response
+from .forms import LoginForm
+from app import app
 
 users_bp = Blueprint(
     'users', __name__,
@@ -20,15 +22,26 @@ def admin():
 
 @users_bp.route("/login", methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        if request.form['username'] != 'kimachuk' or \
-                request.form['password'] != 'volodymyr':
-            flash('Неправильний пароль або логін!','error')
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
+        remember = form.remember.data
+        if username == 'admin' and password == 'secret':
+            session['username'] = username
+            app.logger.info(f"Successful login for user: {username}")
+            remember_msg = "із запам'ятовуванням" if remember else "без запам'ятовування"
+            flash(f"Вхід успішно виконано, {username}! ({remember_msg})", 'success')
+            return redirect(url_for('users_bp.profile'))
         else:
-            session['username'] = request.form['username']
-            flash('Ви успішно залогінені!','success')
-            return redirect(url_for('users.profile'))
-    return render_template("users/login.html",title="Login")
+            app.logger.warning(f"Failed login attempt for user: {username}")
+
+            flash('Неправильне ім\'я користувача або пароль.', 'error')
+            return redirect(url_for('users_bp.login'))
+    elif request.method == 'POST':
+        app.logger.debug(f"Login form validation failed. Errors: {form.errors}")
+    return render_template("users/login.html", title="Login Page", form=form)
+
 
 @users_bp.route("/profile", methods=["GET", "POST"])
 def profile():
