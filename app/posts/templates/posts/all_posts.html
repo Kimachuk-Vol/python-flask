@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+
+            {% set show_all = request.args.get('show_all') == 'true' %}
+
+            <div class="mb-4 pb-3 border-bottom">
+
+                <h1 class="mb-3 text-primary text-center">✨ Усі пости ✨</h1>
+
+                <div class="d-flex justify-content-center flex-wrap gap-2">
+
+                    <a href="{{ url_for('posts.create') }}" class="btn btn-success shadow-sm">
+                        Створити новий пост
+                    </a>
+
+                    {% if show_all %}
+                    <a href="{{ url_for('posts.get_posts') }}" class="btn btn-outline-secondary">
+                        &larr; Показати тільки активні пости
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('posts.get_posts', show_all='true') }}" class="btn btn-outline-secondary">
+                        Показати всі пости
+                    </a>
+                    {% endif %}
+                </div>
+
+            </div>
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-lg-3 col-md-6 mb-4">
+
+                    <div class="card shadow h-100 position-relative">
+
+                        <div class="position-absolute top-0 end-0 p-2" style="z-index: 10;">
+                            <div class="d-flex flex-column align-items-end gap-1">
+                                {% if not post.is_active %}
+                                <span class="badge text-bg-warning rounded-pill">
+                                    Прихований
+                                </span>
+                                {% endif %}
+                                <span class="badge text-bg-danger rounded-pill">
+                                    {{ post.category.name.capitalize() }}
+                                </span>
+                            </div>
+                        </div>
+                        <img src="{{ url_for('static', filename='images/postdefault.jpg') }}"
+                            class="card-img-top {{ 'opacity-50' if not post.is_active else '' }}"
+                            alt="Зображення поста">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h3 class="card-title h5">
+                                <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                                    class="text-decoration-none {{ 'text-muted' if not post.is_active else 'text-body' }}">
+                                    {{ post.title }}
+                                </a>
+                            </h3>
+
+                            <p class="card-text {{ 'text-muted' if not post.is_active else '' }}">
+                                {{ post.content | truncate(100, True) }}
+                            </p>
+                        </div>
+
+                        <div class="card-footer mt-auto border-top-0 pt-0">
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                                    class="btn btn-outline-primary btn-sm">
+                                    Читати далі &rarr;
+                                </a>
+
+                                <div class="text-end">
+                                    <div class="text-muted small mt-1">
+                                        {{ post.posted.strftime('%Y-%m-%d') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% else %}
+                <div class="col-12">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body text-center p-5">
+                            <h3 class="text-muted mb-3">😢</h3>
+                            <h4 class="text-muted">Постів не знайдено</h4>
+                            <p class="mb-4">Здається, ще ніхто нічого не опублікував.</p>
+                            <a href="{{ url_for('posts.create') }}" class="btn btn-primary">
+                                ✨ Створити перший пост
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,10 +1,10 @@
 import unittest
-from app import app 
+from app import create_app
 
 class ProductBlueprintTestCase(unittest.TestCase):
     def setUp(self):
         """Налаштування клієнта тестування перед кожним тестом."""
-        self.app = app
+        self.app = create_app("test")
         self.app.config["TESTING"] = True
         self.client = self.app.test_client()
 
@@ -68,7 +68,7 @@ class ProductBlueprintTestCase(unittest.TestCase):
         
         # Опціонально: перевіряємо, чи тіло відповіді містить загальний текст помилки
         response_data = response.data.decode('utf-8')
-        self.assertIn("Not Found", response_data)
+        self.assertIn("Сторінку не знайдено", response_data)
 
 if __name__ == "__main__":
     unittest.main()

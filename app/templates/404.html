@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <div class="card-body p-4 p-md-5 text-center">
+
+                <h1 class="text-primary" style="font-size: 5rem;">🤔</h1>
+
+                <h2 class="mb-3">Сторінку не знайдено!</h2>
+
+                <p class="lead mb-4">
+                    Нам дуже шкода, але сторінка, яку ви шукали, не існує. Можливо, вона була переміщена або
+                    видалена.
+                </p>
+
+                <a href="{{ url_for('posts.get_posts') }}" class="btn btn-primary btn-lg">
+                    Повернутися до всіх постів
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
