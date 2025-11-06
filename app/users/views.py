@@ -1,6 +1,5 @@
-from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response
+from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response, current_app
 from ..forms import LoginForm
-from app import app
 
 users_bp = Blueprint(
     'users', __name__,
@@ -49,7 +48,7 @@ def login():
         if username == 'kimachuk' and password == 'volodymyr':
             # Store username in the session
             session['username'] = username
-            app.logger.info(f"Successful login for user: {username}")
+            current_app.logger.info(f"Successful login for user: {username}")
             
             # Set feedback message based on 'remember me'
             remember_msg = "with 'remember me'" if remember else "without 'remember me'"
@@ -59,7 +58,7 @@ def login():
             return redirect(url_for('users.profile'))
         else:
             # Failed authentication
-            app.logger.warning(f"Failed login attempt for user: {username}")
+            current_app.logger.warning(f"Failed login attempt for user: {username}")
             flash('Invalid username or password.', 'error') 
             
             # NOTE: Redirecting on a failed login clears the form.
@@ -70,7 +69,7 @@ def login():
             
     elif request.method == 'POST':
         # Form validation failed
-        app.logger.debug(f"Login form validation failed. Errors: {form.errors}")
+        current_app.logger.debug(f"Login form validation failed. Errors: {form.errors}")
         flash("Login failed. Please check the form errors.", "error")
         
     # Render the login page for a GET request or after a failed validation
