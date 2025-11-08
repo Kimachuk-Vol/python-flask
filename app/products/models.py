@@ -1,4 +1,3 @@
-# app/products/models.py
 from datetime import datetime
 from sqlalchemy import Integer, String, Float, ForeignKey, Boolean, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -14,7 +13,7 @@ class Category(db.Model):
     products: Mapped[list["Product"]] = relationship(
         "Product",
         back_populates="category",
-        lazy="select" #або dynamic / joined
+        lazy="select" 
     )
 
 class Product(db.Model):
