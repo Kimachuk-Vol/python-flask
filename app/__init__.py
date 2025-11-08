@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import MetaData
 from .config import config_map
 from sqlalchemy.orm import DeclarativeBase
 from flask_migrate import Migrate
@@ -14,7 +15,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Base(DeclarativeBase):
-    pass
+    metadata = MetaData(naming_convention={
+        "ix": 'ix_%(column_0_label)s',
+        "uq": "uq_%(table_name)s_%(column_0_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s"
+    })
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
@@ -60,6 +67,8 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
         # Import and register the 'products' Blueprint
         from .products import products_bp as products_blueprint
         app.register_blueprint(products_blueprint, url_prefix="/shop")
+
+        from .products import models
 
         # Import and register the 'posts' Blueprint
         from .posts import post_bp as posts_blueprint
