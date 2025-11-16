@@ -5,7 +5,8 @@ from wtforms import (
     SubmitField, 
     SelectField,
     BooleanField,
-    DateTimeLocalField  
+    DateTimeLocalField,
+    SelectMultipleField
 )
 from wtforms.validators import (
     DataRequired, 
@@ -36,6 +37,12 @@ class PostForm(FlaskForm):
         "Дата публікації",
         format='%Y-%m-%dT%H:%M',  
         default=datetime.utcnow,
+        validators=[DataRequired()]
+    )
+
+    user = SelectField(
+        "Автор",
+        coerce=int,
         validators=[DataRequired()]
     )
     

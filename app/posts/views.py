@@ -2,17 +2,21 @@ from flask import render_template, abort, redirect, url_for, flash, request, cur
 from . import post_bp
 from .forms import PostForm
 from .. import db
-from .models import Post, PostCategory 
+from .models import User, Post, PostCategory 
+from sqlalchemy import select
 
 @post_bp.route('/create', methods=["GET", "POST"]) 
 def create():
     form = PostForm()
+
+    user_query = select(User).order_by(User.username)
+    form.user.choices = [
+        (user.id, user.username) for user in db.session.scalars(user_query)
+    ]
+
     if form.validate_on_submit():
         
-        author_name = 'Anonymous' 
-        
-        if 'username' in session:
-            author_name = session['username']
+        selected_user = db.session.get(User, form.user.data) 
 
         new_post = Post(
             title=form.title.data,
@@ -20,7 +24,7 @@ def create():
             posted=form.posted.data,
             category=PostCategory(form.category.data),
             is_active=form.is_active.data,
-            author=author_name 
+            user=selected_user  
         )
         
         db.session.add(new_post)
@@ -54,14 +58,28 @@ def detail_post(id):
 def update(id):
     post = Post.query.get_or_404(id)
 
-    form = PostForm(obj=post) if request.method == 'GET' else PostForm()
+    if request.method == 'POST':
+        form = PostForm()
+    else: 
+        form = PostForm(obj=post)
+        form.user.data = post.user_id 
+
+    user_query = select(User).order_by(User.username)
+    form.user.choices = [
+        (user.id, user.username) for user in db.session.scalars(user_query)
+    ]
 
     if form.validate_on_submit():
+
+        selected_user = db.session.get(User, form.user.data)
+
         post.title = form.title.data
         post.content = form.content.data
         post.posted = form.posted.data
         post.category = PostCategory(form.category.data)
         post.is_active = form.is_active.data
+        
+        post.user = selected_user
         
         db.session.commit()
         
