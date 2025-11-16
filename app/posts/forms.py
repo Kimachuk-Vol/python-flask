@@ -45,6 +45,11 @@ class PostForm(FlaskForm):
         coerce=int,
         validators=[DataRequired()]
     )
+
+    tags = SelectMultipleField(
+        "Tags", 
+        coerce=int
+    )
     
     # category (SelectField) 
     category = SelectField(

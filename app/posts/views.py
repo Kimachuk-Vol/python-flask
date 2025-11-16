@@ -2,7 +2,7 @@ from flask import render_template, abort, redirect, url_for, flash, request, cur
 from . import post_bp
 from .forms import PostForm
 from .. import db
-from .models import User, Post, PostCategory 
+from .models import User, Post, PostCategory, Tag
 from sqlalchemy import select
 
 @post_bp.route('/create', methods=["GET", "POST"]) 
@@ -14,9 +14,20 @@ def create():
         (user.id, user.username) for user in db.session.scalars(user_query)
     ]
 
+    tag_query = select(Tag).order_by(Tag.name)
+    form.tags.choices = [
+        (tag.id, tag.name)    # id → value, name → label
+        for tag in db.session.scalars(tag_query)
+    ]
+
     if form.validate_on_submit():
         
         selected_user = db.session.get(User, form.user.data) 
+
+        selected_tags = [
+            db.session.get(Tag, tag_id) 
+            for tag_id in form.tags.data
+        ]
 
         new_post = Post(
             title=form.title.data,
@@ -26,6 +37,8 @@ def create():
             is_active=form.is_active.data,
             user=selected_user  
         )
+
+        new_post.tags.extend(selected_tags)
         
         db.session.add(new_post)
         db.session.commit()
@@ -63,15 +76,25 @@ def update(id):
     else: 
         form = PostForm(obj=post)
         form.user.data = post.user_id 
+        form.tags.data = [tag.id for tag in post.tags]
 
     user_query = select(User).order_by(User.username)
     form.user.choices = [
         (user.id, user.username) for user in db.session.scalars(user_query)
     ]
 
+    tag_query = select(Tag).order_by(Tag.name)
+    form.tags.choices = [
+        (tag.id, tag.name) for tag in db.session.scalars(tag_query)
+    ]
+
     if form.validate_on_submit():
 
         selected_user = db.session.get(User, form.user.data)
+        selected_tags = [
+            db.session.get(Tag, tag_id) 
+            for tag_id in form.tags.data
+        ]
 
         post.title = form.title.data
         post.content = form.content.data
@@ -80,7 +103,8 @@ def update(id):
         post.is_active = form.is_active.data
         
         post.user = selected_user
-        
+        post.tags = selected_tags 
+
         db.session.commit()
         
         flash("Пост успішно оновлено!", "info")
