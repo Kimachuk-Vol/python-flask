@@ -31,15 +31,17 @@ request.cookies.get('theme', 'light') %}
                 </div>
             </div>
 
-            <div class="btn-group " role="group" aria-label="Theme switcher">
-                <a href="{{ url_for('users.set_theme', theme_name='light') }}"
-                    class="btn btn-outline-primary {% if current_theme == 'light' %}active{% endif %}">
-                    <i class="bi bi-sun-fill"></i> Світла
-                </a>
-                <a href="{{ url_for('users.set_theme', theme_name='dark') }}"
-                    class="btn btn-outline-primary {% if current_theme == 'dark' %}active{% endif %}">
-                    <i class="bi bi-moon-stars-fill"></i> Темна
-                </a>
+            <div class="row mb-4 justify-content-center">
+                <div class="btn-group " role="group" aria-label="Theme switcher">
+                    <a href="{{ url_for('users.set_theme', theme_name='light') }}"
+                        class="btn btn-outline-primary {% if current_theme == 'light' %}active{% endif %}">
+                        <i class="bi bi-sun-fill"></i> Світла
+                    </a>
+                    <a href="{{ url_for('users.set_theme', theme_name='dark') }}"
+                        class="btn btn-outline-primary {% if current_theme == 'dark' %}active{% endif %}">
+                        <i class="bi bi-moon-stars-fill"></i> Темна
+                    </a>
+                </div>
             </div>
         </div>
 

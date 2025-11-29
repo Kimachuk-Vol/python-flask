@@ -1,5 +1,8 @@
 from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response, current_app
-from ..forms import LoginForm
+from .forms import LoginForm, RegistrationForm
+from .. import db
+from .models import User
+from flask_login import login_user, login_required, current_user, logout_user
 
 users_bp = Blueprint(
     'users', __name__,
@@ -19,11 +22,6 @@ def greetings(name):
 
 @users_bp.route("/admin")
 def admin():
-    """
-    An admin route that demonstrates a redirect to another route
-    within the blueprint, passing parameters.
-    """
-    # Build an external URL for the 'users.greetings' route
     to_url = url_for(
         "users.greetings", 
         name="administrator", 
@@ -32,59 +30,71 @@ def admin():
     )
     return redirect(to_url)
 
+@users_bp.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    
+    if current_user.is_authenticated:
+        return redirect(url_for('users.account'))
+
+    if form.validate_on_submit():
+        
+        hashed_password = User.hash_password(form.password.data)
+
+        user = User(
+            username=form.username.data, 
+            email=form.email.data, 
+            password=hashed_password
+        )
+
+        db.session.add(user)
+        db.session.commit()
+        
+        flash("Your account has been created! You can now log in.", "success")
+        
+        return redirect(url_for('users.login')) 
+
+    return render_template("users/register.html", title="Registration", form=form)
+
+
 @users_bp.route("/login", methods=['GET', 'POST'])
 def login():
-    """
-    Handles the user login page.
-    GET: Displays the login form.
-    POST: Validates credentials and manages the user session.
-    """
     form = LoginForm()
+
     if form.validate_on_submit():
-        username = form.username.data
+        username_or_email = form.username.data  
         password = form.password.data
         remember = form.remember.data
 
-        if username == 'kimachuk' and password == 'volodymyr':
-            # Store username in the session
-            session['username'] = username
-            current_app.logger.info(f"Successful login for user: {username}")
+        user = User.query.filter_by(username=username_or_email).first()
+
+        if user and user.check_password(password):
+            session['user_id'] = user.id  
+            session['username'] = user.username 
+
+            login_user(user, remember=form.remember.data)
             
-            # Set feedback message based on 'remember me'
+            current_app.logger.info(f"Successful login for user: {user.username}")
+            
             remember_msg = "with 'remember me'" if remember else "without 'remember me'"
-            flash(f"Login successful, {username}! ({remember_msg})", 'success')
+            flash(f"Login successful, {username_or_email}! ({remember_msg})", 'success')
             
-            # Redirect to the user's profile page
-            return redirect(url_for('users.profile'))
+            return redirect(url_for('users.account'))
         else:
-            # Failed authentication
-            current_app.logger.warning(f"Failed login attempt for user: {username}")
+            current_app.logger.warning(f"Failed login attempt for user: {username_or_email}")
             flash('Invalid username or password.', 'error') 
-            
-            # NOTE: Redirecting on a failed login clears the form.
-            # It's often better UX to re-render the template:
-            # return render_template("users/login.html", title="Login Page", form=form)
-            # But sticking to your original logic:
             return redirect(url_for('users.login'))
             
     elif request.method == 'POST':
-        # Form validation failed
         current_app.logger.debug(f"Login form validation failed. Errors: {form.errors}")
         flash("Login failed. Please check the form errors.", "error")
         
-    # Render the login page for a GET request or after a failed validation
     return render_template("users/login.html", title="Login Page", form=form)
 
 @users_bp.route("/profile", methods=["GET", "POST"])
 def profile():
-    """
-    Displays the user's profile page, accessible only when logged in.
-    Also handles POST requests for managing user preferences (theme)
-    and custom cookies.
-    """
     username = session.get("username")
     
-    # If user is not in session, redirect to login
     if not username:
         flash("Please log in to view this page.", "warning")
         return redirect(url_for("users.login"))
@@ -147,14 +157,11 @@ def profile():
 
 @users_bp.route("/logout")
 def logout():
-    """
-    Logs the user out by clearing the session and 'theme' cookie.
-    """
-    # Remove the username from the session
     session.pop("username", None)
+    logout_user()
+
     flash("You have been logged out.", "success")
-    
-    # Create a response to redirect and clear cookies
+
     response = make_response(redirect(url_for("users.login")))
     response.delete_cookie("theme")
     return response
@@ -178,3 +185,36 @@ def set_theme(theme_name):
     
     flash(f"Theme changed to {theme_name}.", "info")
     return resp
+
+@users_bp.route("/account")
+@login_required
+def account():
+    if 'user_id' not in session:
+        flash('You must log in to access this page.', 'info')
+        return redirect(url_for('users.login'))
+
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    
+    if user is None:
+        flash('Authorization error. Please try logging in again.', 'error')
+        session.pop('user_id', None)
+        session.pop('username', None)
+        return redirect(url_for('users.login'))
+
+    return render_template("users/account.html", title="My Account", user=user)
+
+
+@users_bp.route("/users")
+@login_required
+def list_users():
+    users = User.query.order_by(User.username).all()
+
+    user_count = len(users)
+
+    return render_template(
+        "users/list_users.html",
+        title="User List",
+        users=users,
+        user_count=user_count
+    )

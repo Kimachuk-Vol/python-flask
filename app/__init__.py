@@ -44,7 +44,7 @@ def create_app(config_name: str = os.environ.get("FLASK_CONFIG", "dev")) -> Flas
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
-    login_manager.login_view = 'users_bp.login'
+    login_manager.login_view = 'users.login'
     login_manager.login_message = 'Please log in to access this page'
     login_manager.login_message_category = 'warning'
 

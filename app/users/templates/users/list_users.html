@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <h3 class="mb-4 d-flex align-items-center">
+        Registered Users
+        <span class="badge bg-success ms-2 px-3 py-2">{{ user_count }}</span>
+    </h3>
+
+    {% if user_count == 0 %}
+    <!-- Message when no users exist -->
+    <div class="alert alert-info text-center py-3 shadow-sm" role="alert">
+        There are currently no registered users in the system.
+    </div>
+
+    {% else %}
+
+    <!-- Stylish table container -->
+    <div class="card-body p-0">
+
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col"># ID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <!-- You can add more columns, e.g., Registration Date -->
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <th scope="row" class="fw-semibold">{{ user.id }}</th>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+
+    {% endif %}
+</div>
+{% endblock content %}

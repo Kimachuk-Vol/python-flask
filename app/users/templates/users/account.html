@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="card shadow-sm rounded-3 border-0">
+                <div class="card-body text-center py-4">
+                    <h4 class="mb-1 fw-semibold">{{ user.username }}</h4>
+                    <p class="text-muted mb-0">{{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-semibold">My Posts</h4>
+                <span class="badge bg-primary px-3 py-2 fs-6">
+                    {{ user.posts | length }}
+                </span>
+            </div>
+
+            {% if user.posts %}
+            {% for post in user.posts %}
+            <div class="card mb-4 shadow-sm border-0 rounded-4">
+                <div class="card-body p-4">
+
+                    <h5 class="card-title mb-2">
+                        <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                            class="text-decoration-none fw-semibold text-dark">
+                            {{ post.title }}
+                        </a>
+                    </h5>
+
+                    <p class="card-text text-muted small">
+                        {{ post.content | truncate(150) }}
+                    </p>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Published: <span class="fw-semibold">{{ post.posted.strftime('%Y-%m-%d') }}</span>
+                        </small>
+
+                        <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                            class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            Read more
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="alert alert-info text-center py-3 rounded-3 shadow-sm" role="alert">
+                You haven't created any posts yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
