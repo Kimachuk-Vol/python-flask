@@ -1,13 +1,20 @@
 from flask import Blueprint, url_for, redirect, request, render_template, flash, session, make_response, current_app
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, UpdateAccountForm, ChangePasswordForm
 from .. import db
 from .models import User
 from flask_login import login_user, login_required, current_user, logout_user
 
+import os
+import secrets
+from PIL import Image
+
+from datetime import datetime
+
 users_bp = Blueprint(
     'users', __name__,
     template_folder='templates',
-    static_folder='static'
+    static_folder='static',
+    static_url_path='/users/static'
 )
 
 @users_bp.route("/hi/<string:name>")
@@ -186,23 +193,84 @@ def set_theme(theme_name):
     flash(f"Theme changed to {theme_name}.", "info")
     return resp
 
-@users_bp.route("/account")
+def save_picture(form_picture):
+    """
+    Зберігає:
+    1. Оригінал зображення (file_name.ext).
+    2. Мініатюру 128x128 (thumb_file_name.ext).
+    Повертає ім'я файлу оригіналу.
+    """
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    
+    images_folder = os.path.join(current_app.blueprints['users'].root_path, 'static/images')
+    original_path = os.path.join(images_folder, picture_fn)
+    thumb_path = os.path.join(images_folder, 'thumb_' + picture_fn)
+
+    i = Image.open(form_picture)
+
+    i.save(original_path)
+
+    i.thumbnail((128, 128))
+    i.save(thumb_path)
+
+    return picture_fn
+
+@users_bp.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+
+@users_bp.route("/account", methods=["GET","POST"])
 @login_required
 def account():
-    if 'user_id' not in session:
-        flash('You must log in to access this page.', 'info')
-        return redirect(url_for('users.login'))
+    """
+    Обробляє запит до сторінки акаунту та дозволяє оновлювати дані.
+    """
+    form = UpdateAccountForm()
+    pwd_form = ChangePasswordForm()
 
-    user_id = session['user_id']
-    user = User.query.get(user_id)
+    if form.submit.data and form.validate():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image = picture_file
+
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.about_me = form.about_me.data
+        
+        db.session.commit()
+        flash('Ваш акаунт успішно оновлено!', 'success')
+        return redirect(url_for('users.account'))
     
-    if user is None:
-        flash('Authorization error. Please try logging in again.', 'error')
-        session.pop('user_id', None)
-        session.pop('username', None)
-        return redirect(url_for('users.login'))
+    if pwd_form.submit_pass.data and pwd_form.validate():
+        if current_user.check_password(pwd_form.old_password.data):
+            hashed_password = User.hash_password(pwd_form.new_password.data)
+            current_user.password = hashed_password
+            
+            db.session.commit()
+            flash('Ваш пароль успішно змінено!', 'success')
+            return redirect(url_for('users.account'))
+        else:
+            flash('Старий пароль введено невірно.', 'error')
 
-    return render_template("users/account.html", title="My Account", user=user)
+    if request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.about_me.data = current_user.about_me
+
+    image_file = url_for('users.static', filename='images/' + (current_user.image or 'profile_default.jpg'))
+
+    return render_template(
+            "users/account.html", 
+            title="Мій акаунт", 
+            user=current_user, 
+            form=form, 
+            pwd_form=pwd_form, 
+            image_file=image_file
+        )
 
 
 @users_bp.route("/users")

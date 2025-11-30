@@ -1,66 +1,261 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+    /* Легка анімація для постів */
+    .post-item {
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
 
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-10 col-lg-8">
-            <div class="card shadow-sm rounded-3 border-0">
-                <div class="card-body text-center py-4">
-                    <h4 class="mb-1 fw-semibold">{{ user.username }}</h4>
-                    <p class="text-muted mb-0">{{ user.email }}</p>
+    .post-item:last-child {
+        border-bottom: none;
+    }
+
+    .post-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    [data-bs-theme="dark"] .post-item:hover {
+        background-color: #1d1e1f;
+    }
+
+    /* Аватар */
+    .profile-img-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Колір лейблів у плаваючих формах */
+    .form-floating>label {
+        color: #8c98a4;
+    }
+
+    /* Тіні для головних блоків */
+    .main-card-shadow {
+        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    }
+</style>
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 col-xl-9">
+            <div class=" main-card-shadow border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-success bg-gradient p-4 text-white border-0">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-person-circle me-2"></i>Налаштування профілю</h4>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-5 align-items-center">
+                        <div class="col-md-4 text-center border-end-md">
+                            <div class="profile-img-container mb-3">
+                                {% if user.image and 'default' not in user.image %}
+                                {% set image_file = 'images/thumb_' + user.image %}
+                                {% else %}
+                                {% set image_file = 'images/' + (user.image or 'profile_default.jpg') %}
+                                {% endif %}
+
+                                <img src="{{ url_for('users.static', filename=image_file) }}" alt="{{ user.username }}"
+                                    class="rounded-circle shadow-sm p-1 bg-white"
+                                    style="width: 160px; height: 160px; object-fit: cover;">
+                            </div>
+
+                            <h4 class="fw-bold text-dark mb-1">{{ user.username }}</h4>
+                            <p class="text-muted small mb-3">{{ user.email }}</p>
+
+                            <div class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="bi bi-clock-history me-1"></i>
+                                {{ user.last_seen.strftime("%d.%m.%Y %H:%M") }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <h5 class="fw-bold mb-4 text-secondary">Основна інформація</h5>
+
+                            <form method="POST" action="" enctype="multipart/form-data" novalidate>
+                                {{ form.hidden_tag() }}
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {% if form.username.errors %}
+                                            {{ form.username(class="form-control is-invalid", placeholder="Ім'я") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.username.errors %}<span>{{ error }}</span>{% endfor
+                                                %}
+                                            </div>
+                                            {% else %}
+                                            {{ form.username(class="form-control", placeholder="Ім'я") }}
+                                            {% endif %}
+                                            {{ form.username.label }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            {% if form.email.errors %}
+                                            {{ form.email(class="form-control is-invalid", placeholder="Email") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                                            </div>
+                                            {% else %}
+                                            {{ form.email(class="form-control", placeholder="Email") }}
+                                            {% endif %}
+                                            {{ form.email.label }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    {% if form.about_me.errors %}
+                                    {{ form.about_me(class="form-control is-invalid", style="height: 100px",
+                                    placeholder="Про себе") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.about_me.errors %}<span>{{ error }}</span>{% endfor %}
+                                    </div>
+                                    {% else %}
+                                    {{ form.about_me(class="form-control", style="height: 100px", placeholder="Про
+                                    себе") }}
+                                    {% endif %}
+                                    {{ form.about_me.label }}
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="picture" class="form-label small text-muted ms-1">Змінити фото
+                                        профілю</label>
+                                    {{ form.picture(class="form-control form-control-sm") }}
+                                    {% if form.picture.errors %}
+                                    {% for error in form.picture.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-grid d-md-flex justify-content-md-end">
+                                    {{ form.submit(class="btn btn-success px-4 py-2 rounded-pill fw-semibold shadow-sm")
+                                    }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Posts Section -->
-    <div class="row justify-content-center">
-        <div class="col-md-10 col-lg-8">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-semibold">My Posts</h4>
-                <span class="badge bg-primary px-3 py-2 fs-6">
-                    {{ user.posts | length }}
-                </span>
-            </div>
-
-            {% if user.posts %}
-            {% for post in user.posts %}
-            <div class="card mb-4 shadow-sm border-0 rounded-4">
-                <div class="card-body p-4">
-
-                    <h5 class="card-title mb-2">
-                        <a href="{{ url_for('posts.detail_post', id=post.id) }}"
-                            class="text-decoration-none fw-semibold text-dark">
-                            {{ post.title }}
-                        </a>
-                    </h5>
-
-                    <p class="card-text text-muted small">
-                        {{ post.content | truncate(150) }}
-                    </p>
-
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            Published: <span class="fw-semibold">{{ post.posted.strftime('%Y-%m-%d') }}</span>
-                        </small>
-
-                        <a href="{{ url_for('posts.detail_post', id=post.id) }}"
-                            class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                            Read more
-                        </a>
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 col-xl-9">
+            <div class=" border-0 shadow rounded-4">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-danger bg-opacity-10 p-2 rounded-circle me-3">
+                            <i class="bi bi-shield-lock text-danger fs-4"></i>
+                        </div>
+                        <h5 class="card-title mb-0 fw-bold">Зміна паролю</h5>
                     </div>
 
+                    <form method="POST" action="" novalidate>
+                        {{ pwd_form.hidden_tag() }}
+
+                        <div class="row g-3 align-items-start">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ pwd_form.old_password(class="form-control" + (" is-invalid" if
+                                    pwd_form.old_password.errors else ""), placeholder="Старий пароль") }}
+                                    {{ pwd_form.old_password.label }}
+                                    {% if pwd_form.old_password.errors %}
+                                    <div class="invalid-feedback">{{ pwd_form.old_password.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ pwd_form.new_password(class="form-control" + (" is-invalid" if
+                                    pwd_form.new_password.errors else ""), placeholder="Новий пароль") }}
+                                    {{ pwd_form.new_password.label }}
+                                    {% if pwd_form.new_password.errors %}
+                                    <div class="invalid-feedback">{{ pwd_form.new_password.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ pwd_form.confirm_password(class="form-control" + (" is-invalid" if
+                                    pwd_form.confirm_password.errors else ""), placeholder="Підтвердження") }}
+                                    {{ pwd_form.confirm_password.label }}
+                                    {% if pwd_form.confirm_password.errors %}
+                                    <div class="invalid-feedback">{{ pwd_form.confirm_password.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-end">
+                            {{ pwd_form.submit_pass(class="btn btn-outline-danger px-4 rounded-pill fw-semibold") }}
+                        </div>
+                    </form>
                 </div>
             </div>
-            {% endfor %}
-            {% else %}
-            <div class="alert alert-info text-center py-3 rounded-3 shadow-sm" role="alert">
-                You haven't created any posts yet.
-            </div>
-            {% endif %}
         </div>
     </div>
+
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 col-xl-9">
+            <div class="main-card-shadow border-0 rounded-4 overflow-hidden">
+
+                <div
+                    class="card-header bg-info bg-gradient p-4 text-white border-0 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-collection me-2"></i>Мої Публікації</h4>
+                    <span class="badge bg-white text-info shadow-sm px-3 py-2 fs-6 rounded-pill">
+                        {{ user.posts | length }}
+                    </span>
+                </div>
+
+                <div class="card-body p-0">
+                    {% if user.posts %}
+                    <div>
+                        {% for post in user.posts %}
+                        <div class="p-4 post-item border-0 position-relative">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                <div>
+                                    <h5 class="card-title mb-2">
+                                        <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                                            class="text-decoration-none fw-bold stretched-link">
+                                            {{ post.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text text-secondary mb-3 small">
+                                        {{ post.content | truncate(150) }}
+                                    </p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        {{ post.posted.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </div>
+
+                                <a href="{{ url_for('posts.detail_post', id=post.id) }}"
+                                    class="btn btn-outline-info btn-sm rounded-pill px-4 position-relative z-2">
+                                    Читати
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-journal-x fs-1 text-muted mb-3 d-block"></i>
+                        <p class="text-muted mb-0">Ви ще не створили жодної публікації.</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if user.posts|length > 5 %}
+                <div class="card-footer bg-light text-center py-3 border-0">
+                    <small class="text-muted">Показано останні публікації</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock content %}
