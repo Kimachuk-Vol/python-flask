@@ -193,13 +193,21 @@ def set_theme(theme_name):
     flash(f"Theme changed to {theme_name}.", "info")
     return resp
 
+@users_bp.route("/users")
+@login_required
+def list_users():
+    users = User.query.order_by(User.username).all()
+
+    user_count = len(users)
+
+    return render_template(
+        "users/list_users.html",
+        title="User List",
+        users=users,
+        user_count=user_count
+    )
+
 def save_picture(form_picture):
-    """
-    Зберігає:
-    1. Оригінал зображення (file_name.ext).
-    2. Мініатюру 128x128 (thumb_file_name.ext).
-    Повертає ім'я файлу оригіналу.
-    """
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
@@ -226,9 +234,6 @@ def before_request():
 @users_bp.route("/account", methods=["GET","POST"])
 @login_required
 def account():
-    """
-    Обробляє запит до сторінки акаунту та дозволяє оновлювати дані.
-    """
     form = UpdateAccountForm()
     pwd_form = ChangePasswordForm()
 
@@ -271,18 +276,3 @@ def account():
             pwd_form=pwd_form, 
             image_file=image_file
         )
-
-
-@users_bp.route("/users")
-@login_required
-def list_users():
-    users = User.query.order_by(User.username).all()
-
-    user_count = len(users)
-
-    return render_template(
-        "users/list_users.html",
-        title="User List",
-        users=users,
-        user_count=user_count
-    )
